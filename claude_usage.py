@@ -358,7 +358,7 @@ class UsageWidget:
         steps = tk.Frame(frame, bg=self.BG)
         steps.pack(fill="x", pady=(2, 6))
         tk.Label(steps, text=(
-            "1. Open claude.ai in Chrome\n"
+            "1. Open claude.ai in your browser\n"
             "2. F12 > Network tab > reload page\n"
             "3. Click any request > Headers > cookie: > copy value"
         ), bg=self.BG, fg=self.DIM, font=("Segoe UI", 8), anchor="w",

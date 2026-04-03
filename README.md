@@ -47,17 +47,28 @@ pythonw claude_usage.py
 
 ### First Run Setup
 
-1. Open [claude.ai](https://claude.ai) in Chrome and log in
+You need to copy the `cookie:` header from your browser's DevTools. This works in **any browser** — Chrome, Firefox, Edge, Brave, Arc, etc.
+
+1. Open [claude.ai](https://claude.ai) in your browser and log in
 2. Open DevTools (`F12`) > **Network** tab
 3. Reload the page
-4. Click any request > **Headers** tab > find the `cookie:` header > copy the full value
+4. Click any request to `claude.ai` > **Headers** tab > find the `cookie:` request header > copy the full value
 5. Paste it into the widget and click **Connect**
+
+<details>
+<summary>Browser-specific tips</summary>
+
+- **Chrome / Edge / Brave / Arc**: F12 > Network > click any request > Headers > scroll to `cookie:` under Request Headers
+- **Firefox**: F12 > Network > click any request > Headers > scroll to `Cookie` under Request Headers. (Firefox shows it as `Cookie` with a capital C — both formats work.)
+- **Safari**: Develop menu > Show Web Inspector > Network > click a request > Headers > look for `Cookie`
+
+</details>
 
 The widget will auto-detect your organization and start showing usage data.
 
 ### Why Manual Cookie Paste?
 
-Chrome 127+ uses App-Bound Encryption for cookies, making automatic extraction impossible for external tools. The manual paste is the only reliable method. You'll need to re-paste every few hours when the Cloudflare cookies (`cf_clearance`) expire.
+Modern browsers encrypt their cookie storage, making automatic extraction impossible for external tools. The manual paste from DevTools is the only reliable cross-browser method. You'll need to re-paste every few hours when the Cloudflare cookies (`cf_clearance`) expire.
 
 ### Settings
 
