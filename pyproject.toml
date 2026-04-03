@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "claude-usage-widget"
+version = "1.0.0"
+description = "Tiny always-on-top desktop widget showing Claude.ai session and weekly usage limits"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+dependencies = ["curl_cffi>=0.7.0"]
+
+[project.urls]
+Homepage = "https://github.com/subradar/claude-usage-widget"
+Issues = "https://github.com/subradar/claude-usage-widget/issues"
