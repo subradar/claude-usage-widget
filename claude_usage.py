@@ -652,6 +652,7 @@ class UsageWidget:
         menu.add_command(label=f"{check}Always on top", command=self._toggle_topmost)
         menu.add_separator()
         menu.add_command(label="Switch account / re-paste cookies", command=self._logout)
+        menu.add_command(label="Disconnect (clear cookies)", command=self._disconnect)
 
         try:
             menu.tk_popup(self.root.winfo_rootx() + 10, self.root.winfo_rooty() + self.root.winfo_height() - 10)
@@ -660,6 +661,20 @@ class UsageWidget:
 
     def _logout(self):
         self._show_reauth()
+
+    def _disconnect(self):
+        """Clear all cookies and return to the fresh setup screen."""
+        self.cookies = ""
+        self.org_id = ""
+        self.cfg.pop("cookies", None)
+        self.cfg.pop("org_id", None)
+        save_config(self.cfg)
+        for w in self.root.winfo_children():
+            w.destroy()
+        self.root.resizable(False, False)
+        self.root.geometry("340x280")
+        self.root.title("Claude Usage \u2014 Setup")
+        self._build_browser_chooser()
 
     def _refresh(self):
         if self._refreshing:
