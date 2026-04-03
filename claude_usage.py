@@ -325,7 +325,7 @@ class UsageWidget:
 
     def _show_browser_chooser(self):
         self.root.resizable(False, False)
-        self.root.geometry("340x260")
+        self.root.geometry("340x280")
         self.root.title("Claude Usage \u2014 Setup")
         self._build_browser_chooser()
         self.root.mainloop()
@@ -335,7 +335,11 @@ class UsageWidget:
         frame.pack(fill="both", expand=True)
 
         tk.Label(frame, text="Choose how to connect", bg=self.BG, fg=self.TEXT,
-                 font=("Segoe UI", 11, "bold"), anchor="w").pack(fill="x", pady=(0, 12))
+                 font=("Segoe UI", 11, "bold"), anchor="w").pack(fill="x", pady=(0, 2))
+
+        tk.Label(frame, text="Log into claude.ai in your browser first, then pick your browser below.",
+                 bg=self.BG, fg=self.AMBER, font=("Segoe UI", 9),
+                 anchor="w", wraplength=300, justify="left").pack(fill="x", pady=(0, 10))
 
         # Firefox button
         ff_btn = tk.Button(
@@ -522,7 +526,7 @@ class UsageWidget:
         for w in self.root.winfo_children():
             w.destroy()
         self.root.resizable(False, False)
-        self.root.geometry("340x260")
+        self.root.geometry("340x280")
         self._build_browser_chooser()
 
     # ------------------------------------------------------------------
@@ -708,7 +712,7 @@ class UsageWidget:
         for w in self.root.winfo_children():
             w.destroy()
         self.root.resizable(False, False)
-        self.root.geometry("340x290")
+        self.root.geometry("340x310")
         self.root.title("Claude Usage \u2014 Reconnect")
         self._build_browser_chooser(can_cancel=bool(self.cookies))
 
