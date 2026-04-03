@@ -565,11 +565,11 @@ class UsageWidget:
             bar_inner.place(x=0, y=0, relheight=1.0)
 
             pct_label = tk.Label(main, text="--", bg=self.BG, fg=self.TEXT,
-                                 font=("Segoe UI", 9, "bold"), anchor="e", width=4)
+                                 font=("Segoe UI", 9, "bold"), anchor="e", width=6)
             pct_label.grid(row=row_idx, column=2, sticky="e", padx=(6, 2))
 
             reset_label = tk.Label(main, text="", bg=self.BG, fg=self.DIMMER,
-                                   font=("Segoe UI", 8), anchor="e", width=10)
+                                   font=("Segoe UI", 8), anchor="e", width=14)
             reset_label.grid(row=row_idx, column=3, sticky="e", padx=(2, 0))
 
             self.bars[key] = {
