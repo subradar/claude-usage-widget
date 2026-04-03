@@ -16,3 +16,4 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - Cookie input sanitization
 - Network timeout protection (15s)
 - Graceful recovery from corrupted config files
+- Browser-agnostic cookie instructions (Chrome, Firefox, Edge, Brave, Safari, Arc)
