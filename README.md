@@ -81,12 +81,12 @@ Chrome 127+ (July 2024) uses App-Bound Encryption for cookies. The encryption ke
 
 ### Cookie Renewal
 
-Regardless of which method you used, Cloudflare cookies (`cf_clearance`) expire every 2-4 hours. When they expire:
+The `sessionKey` cookie auto-renews on each API call and typically lasts weeks. Cloudflare cookies (`cf_clearance`) have a nominal expiry of 2-4 hours, but the widget's regular API calls appear to keep them alive much longer — sessions lasting 12+ hours without re-authentication have been observed.
+
+When cookies do eventually expire:
 
 - **Firefox users**: Click Settings > Switch account, then click "Firefox (auto-detect)" again. Fresh cookies are pulled automatically.
 - **Chrome/manual users**: Re-paste cookies from DevTools.
-
-The `sessionKey` cookie auto-renews on each API call and typically lasts weeks.
 
 ### Settings
 
@@ -111,7 +111,7 @@ The widget saves its state to `config.json` (auto-generated, gitignored):
 ## Troubleshooting
 
 ### "Auth failed (HTTP 403)" error
-Your Cloudflare cookies have expired. This happens every 2-4 hours. Use Settings > Switch account to reconnect via your browser of choice.
+Your Cloudflare cookies have expired. Use Settings > Switch account to reconnect via your browser of choice.
 
 ### Firefox auto-detect: "No claude.ai cookies found"
 Make sure you've opened [claude.ai](https://claude.ai) in Firefox and logged in. The cookies only exist after a successful login.
@@ -148,7 +148,7 @@ This tool uses claude.ai's internal, undocumented API. It is not affiliated with
 
 ## Limitations
 
-- **Cloudflare cookies expire** every 2-4 hours, requiring reconnection
+- **Cloudflare cookies eventually expire**, requiring reconnection (typically lasts 12+ hours with regular use)
 - **Chrome/Chromium auto-detect not possible** due to App-Bound Encryption
 - **Unofficial API** - Uses claude.ai's internal API which could change without notice
 - **Font rendering** - Uses Segoe UI (Windows default). Falls back to system default on other platforms.

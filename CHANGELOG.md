@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.2.0] - 2026-04-03
+
+### Added
+- Responsive horizontal layout: label, bar, %, and reset time on one line per metric
+- Window is now resizable — bars stretch to fill available width
+- Window size and position saved to config.json and restored on next launch
+
+### Changed
+- Compact default size (420x120) — much smaller desktop footprint
+- Bar labels shortened (Session, Weekly, Sonnet) for horizontal fit
+- Updated cookie expiry docs: sessions last 12+ hours with regular use, not 2-4 hours as originally documented
+
 ## [1.1.0] - 2026-04-03
 
 ### Added

@@ -11,7 +11,7 @@ The sessionKey auto-renews on each API call.
 Requires: pip install curl_cffi
 """
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 import tkinter as tk
 import json
@@ -288,6 +288,11 @@ class UsageWidget:
     FF_ORANGE = "#e05d00"
     SAFARI_BLUE = "#0a84ff"
 
+    # Default geometry for the main usage view
+    MAIN_GEOM = "420x120"
+    MAIN_MIN_W = 320
+    MAIN_MIN_H = 100
+
     def __init__(self):
         self.cfg = load_config()
         self.cookies = self.cfg.get("cookies", "")
@@ -300,8 +305,10 @@ class UsageWidget:
         self.root.title("Claude Usage")
         self.root.configure(bg=self.BG)
         self.root.attributes("-topmost", self.topmost)
-        self.root.resizable(False, False)
-        self.root.geometry("240x245")
+        self.root.resizable(True, True)
+        self.root.minsize(self.MAIN_MIN_W, self.MAIN_MIN_H)
+        geom = self.cfg.get("geometry", self.MAIN_GEOM)
+        self.root.geometry(geom)
         self.root.overrideredirect(False)
 
         if not self.cookies:
@@ -317,6 +324,7 @@ class UsageWidget:
     # ------------------------------------------------------------------
 
     def _show_browser_chooser(self):
+        self.root.resizable(False, False)
         self.root.geometry("340x260")
         self.root.title("Claude Usage \u2014 Setup")
         self._build_browser_chooser()
@@ -395,6 +403,7 @@ class UsageWidget:
         """Switch to manual paste UI."""
         for w in self.root.winfo_children():
             w.destroy()
+        self.root.resizable(False, False)
         self.root.geometry("420x250")
         self._build_manual_paste_ui()
 
@@ -424,7 +433,8 @@ class UsageWidget:
         """Clear setup UI and show the main usage view."""
         for w in self.root.winfo_children():
             w.destroy()
-        self.root.geometry("240x245")
+        geom = self.cfg.get("geometry", self.MAIN_GEOM)
+        self.root.geometry(geom)
         self.root.title("Claude Usage")
         self._build_ui()
         self._refresh()
@@ -511,46 +521,52 @@ class UsageWidget:
     def _back_to_chooser(self):
         for w in self.root.winfo_children():
             w.destroy()
+        self.root.resizable(False, False)
         self.root.geometry("340x260")
         self._build_browser_chooser()
 
     # ------------------------------------------------------------------
-    # Main usage UI
+    # Main usage UI — compact horizontal grid layout
     # ------------------------------------------------------------------
 
     def _build_ui(self):
-        main = tk.Frame(self.root, bg=self.BG, padx=12, pady=10)
+        self.root.resizable(True, True)
+        self.root.minsize(self.MAIN_MIN_W, self.MAIN_MIN_H)
+
+        main = tk.Frame(self.root, bg=self.BG, padx=10, pady=8)
         main.pack(fill="both", expand=True)
+
+        # Grid: col0=label, col1=bar (stretches), col2=pct, col3=reset
+        main.columnconfigure(1, weight=1)
 
         self.bars = {}
         configs = [
-            ("session", "Session (5h)", self.BLUE),
-            ("weekly", "Weekly (7d)", self.AMBER),
-            ("sonnet", "Sonnet (7d)", self.GREEN),
+            ("session", "Session", self.BLUE),
+            ("weekly", "Weekly", self.AMBER),
+            ("sonnet", "Sonnet", self.GREEN),
         ]
 
-        for key, label, color in configs:
-            row = tk.Frame(main, bg=self.BG)
-            row.pack(fill="x", pady=(0, 8))
+        for row_idx, (key, label, color) in enumerate(configs):
+            main.rowconfigure(row_idx, weight=1)
 
-            header = tk.Frame(row, bg=self.BG)
-            header.pack(fill="x")
-            tk.Label(header, text=label, bg=self.BG, fg=self.DIM,
-                     font=("Segoe UI", 9), anchor="w").pack(side="left")
-            pct_label = tk.Label(header, text="--", bg=self.BG, fg=self.TEXT,
-                                 font=("Segoe UI", 10, "bold"), anchor="e")
-            pct_label.pack(side="right")
+            lbl = tk.Label(main, text=label, bg=self.BG, fg=self.DIM,
+                           font=("Segoe UI", 9), anchor="w", width=7)
+            lbl.grid(row=row_idx, column=0, sticky="w", padx=(0, 6))
 
-            bar_outer = tk.Frame(row, bg=self.BAR_BG, height=12)
-            bar_outer.pack(fill="x", pady=(2, 0))
-            bar_outer.pack_propagate(False)
+            bar_outer = tk.Frame(main, bg=self.BAR_BG, height=14)
+            bar_outer.grid(row=row_idx, column=1, sticky="ew", pady=3)
+            bar_outer.grid_propagate(False)
 
-            bar_inner = tk.Frame(bar_outer, bg=color, height=12, width=0)
+            bar_inner = tk.Frame(bar_outer, bg=color, height=14, width=0)
             bar_inner.place(x=0, y=0, relheight=1.0)
 
-            reset_label = tk.Label(row, text="", bg=self.BG, fg=self.DIMMER,
-                                   font=("Segoe UI", 8), anchor="w")
-            reset_label.pack(fill="x")
+            pct_label = tk.Label(main, text="--", bg=self.BG, fg=self.TEXT,
+                                 font=("Segoe UI", 9, "bold"), anchor="e", width=4)
+            pct_label.grid(row=row_idx, column=2, sticky="e", padx=(6, 2))
+
+            reset_label = tk.Label(main, text="", bg=self.BG, fg=self.DIMMER,
+                                   font=("Segoe UI", 8), anchor="e", width=10)
+            reset_label.grid(row=row_idx, column=3, sticky="e", padx=(2, 0))
 
             self.bars[key] = {
                 "pct": pct_label,
@@ -560,20 +576,48 @@ class UsageWidget:
                 "color": color,
             }
 
+        # Separator
+        sep_row = len(configs)
         sep = tk.Frame(main, bg=self.BAR_BG, height=1)
-        sep.pack(fill="x", pady=(2, 4))
+        sep.grid(row=sep_row, column=0, columnspan=4, sticky="ew", pady=(4, 2))
 
-        footer = tk.Frame(main, bg=self.BG)
-        footer.pack(fill="x")
-
-        gear_btn = tk.Label(footer, text="Settings", bg=self.BG, fg="#666666",
+        # Footer
+        footer_row = sep_row + 1
+        gear_btn = tk.Label(main, text="Settings", bg=self.BG, fg="#666666",
                             font=("Segoe UI", 8, "underline"), cursor="hand2")
-        gear_btn.pack(side="left")
+        gear_btn.grid(row=footer_row, column=0, columnspan=2, sticky="w")
         gear_btn.bind("<Button-1>", lambda e: self._show_settings())
 
-        self.status_label = tk.Label(footer, text="Loading...", bg=self.BG, fg=self.DIMMER,
+        self.status_label = tk.Label(main, text="Loading...", bg=self.BG, fg=self.DIMMER,
                                      font=("Segoe UI", 8))
-        self.status_label.pack(side="right")
+        self.status_label.grid(row=footer_row, column=2, columnspan=2, sticky="e")
+
+        # Redraw bars on resize
+        self.root.bind("<Configure>", lambda e: self._on_resize())
+
+        # Save geometry on close
+        self.root.protocol("WM_DELETE_WINDOW", self._on_close)
+
+    def _on_resize(self):
+        """Recalculate bar fill widths after a window resize."""
+        for info in self.bars.values():
+            self.root.update_idletasks()
+            outer_w = info["bar_outer"].winfo_width()
+            if outer_w <= 1:
+                continue
+            pct_text = info["pct"].cget("text").rstrip("%")
+            try:
+                pct = float(pct_text)
+            except ValueError:
+                continue
+            bar_w = int(outer_w * min(pct, 100) / 100)
+            info["bar_inner"].place(x=0, y=0, relheight=1.0, width=bar_w)
+
+    def _on_close(self):
+        """Save window geometry before exit."""
+        self.cfg["geometry"] = self.root.geometry()
+        save_config(self.cfg)
+        self.root.destroy()
 
     def _update_bar(self, key, utilization, resets_at):
         info = self.bars[key]
@@ -663,6 +707,7 @@ class UsageWidget:
         """Show the browser chooser with a Cancel button to return."""
         for w in self.root.winfo_children():
             w.destroy()
+        self.root.resizable(False, False)
         self.root.geometry("340x290")
         self.root.title("Claude Usage \u2014 Reconnect")
         self._build_browser_chooser(can_cancel=bool(self.cookies))
@@ -670,7 +715,8 @@ class UsageWidget:
     def _cancel_setup(self):
         for w in self.root.winfo_children():
             w.destroy()
-        self.root.geometry("240x245")
+        geom = self.cfg.get("geometry", self.MAIN_GEOM)
+        self.root.geometry(geom)
         self.root.title("Claude Usage")
         self._build_ui()
         self._refresh()
