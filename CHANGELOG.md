@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.1.0] - 2026-04-03
+
+### Added
+- Browser chooser dialog on first launch — pick Firefox, Safari, or manual paste
+- Firefox auto-detect: extracts claude.ai cookies from cookies.sqlite automatically (all platforms)
+- Safari auto-detect: parses binary cookie store on macOS (experimental)
+- "Back" button in manual paste view to return to browser chooser
+
+### Changed
+- Setup flow redesigned: browser chooser is now the first screen instead of manual paste
+- Settings > "Switch account" now returns to browser chooser (can re-pick method)
+- Bumped version to 1.1.0
+
 ## [1.0.0] - 2026-04-03
 
 ### Added
@@ -16,4 +29,3 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - Cookie input sanitization
 - Network timeout protection (15s)
 - Graceful recovery from corrupted config files
-- Browser-agnostic cookie instructions (Chrome, Firefox, Edge, Brave, Safari, Arc)

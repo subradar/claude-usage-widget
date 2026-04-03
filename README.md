@@ -19,6 +19,7 @@ Each bar shows utilization percentage, a color-coded progress bar (turns red abo
 
 - **Python 3.10+** with tkinter (included in standard Python installs)
 - **curl_cffi** - Required for Cloudflare TLS fingerprint impersonation
+- No additional dependencies for Firefox/Safari auto-detect (uses Python stdlib)
 
 ### Platform Notes
 
@@ -47,28 +48,45 @@ pythonw claude_usage.py
 
 ### First Run Setup
 
-You need to copy the `cookie:` header from your browser's DevTools. This works in **any browser** — Chrome, Firefox, Edge, Brave, Arc, etc.
+On first launch, you'll see a browser chooser with three options:
+
+#### Firefox (auto-detect)
+Cookies are extracted automatically from Firefox's local cookie database. Just make sure you're logged into [claude.ai](https://claude.ai) in Firefox first. No manual steps required.
+
+- Works on Windows, macOS, and Linux
+- Reads from `cookies.sqlite` (copied to a temp file to avoid lock conflicts)
+- Firefox does **not** encrypt cookies at rest, so no master password is needed
+
+#### Safari (auto-detect, macOS only)
+Cookies are parsed automatically from Safari's binary cookie store. Log into [claude.ai](https://claude.ai) in Safari first.
+
+- macOS only (button is disabled on other platforms)
+- May require Full Disk Access permission for your terminal/Python in System Settings > Privacy & Security
+- Experimental — please report issues
+
+#### Chrome / Other (manual paste)
+For Chrome, Edge, Brave, Arc, and any other Chromium-based browser, cookies must be pasted manually from DevTools:
 
 1. Open [claude.ai](https://claude.ai) in your browser and log in
 2. Open DevTools (`F12`) > **Network** tab
 3. Reload the page
-4. Click any request to `claude.ai` > **Headers** tab > find the `cookie:` request header > copy the full value
+4. Click any request > **Headers** tab > find the `cookie:` request header > copy the full value
 5. Paste it into the widget and click **Connect**
 
 <details>
-<summary>Browser-specific tips</summary>
+<summary>Why can't Chrome cookies be auto-detected?</summary>
 
-- **Chrome / Edge / Brave / Arc**: F12 > Network > click any request > Headers > scroll to `cookie:` under Request Headers
-- **Firefox**: F12 > Network > click any request > Headers > scroll to `Cookie` under Request Headers. (Firefox shows it as `Cookie` with a capital C — both formats work.)
-- **Safari**: Develop menu > Show Web Inspector > Network > click a request > Headers > look for `Cookie`
-
+Chrome 127+ (July 2024) uses App-Bound Encryption for cookies. The encryption key is locked inside Chrome's elevation service and cannot be read by external tools. This affects all Chromium-based browsers (Edge, Brave, Arc, etc.).
 </details>
 
-The widget will auto-detect your organization and start showing usage data.
+### Cookie Renewal
 
-### Why Manual Cookie Paste?
+Regardless of which method you used, Cloudflare cookies (`cf_clearance`) expire every 2-4 hours. When they expire:
 
-Modern browsers encrypt their cookie storage, making automatic extraction impossible for external tools. The manual paste from DevTools is the only reliable cross-browser method. You'll need to re-paste every few hours when the Cloudflare cookies (`cf_clearance`) expire.
+- **Firefox users**: Click Settings > Switch account, then click "Firefox (auto-detect)" again. Fresh cookies are pulled automatically.
+- **Chrome/manual users**: Re-paste cookies from DevTools.
+
+The `sessionKey` cookie auto-renews on each API call and typically lasts weeks.
 
 ### Settings
 
@@ -76,7 +94,7 @@ Click **Settings** in the bottom-left corner:
 
 - **Refresh now** - Trigger an immediate data refresh
 - **Always on top** - Toggle whether the widget stays above other windows
-- **Switch account** - Paste cookies for a different account
+- **Switch account** - Return to browser chooser to reconnect or switch methods
 
 ### Why `curl_cffi`?
 
@@ -93,10 +111,19 @@ The widget saves its state to `config.json` (auto-generated, gitignored):
 ## Troubleshooting
 
 ### "Auth failed (HTTP 403)" error
-Your Cloudflare cookies have expired. This happens every 2-4 hours. Paste fresh cookies from Chrome DevTools.
+Your Cloudflare cookies have expired. This happens every 2-4 hours. Use Settings > Switch account to reconnect via your browser of choice.
+
+### Firefox auto-detect: "No claude.ai cookies found"
+Make sure you've opened [claude.ai](https://claude.ai) in Firefox and logged in. The cookies only exist after a successful login.
+
+### Firefox auto-detect: "Firefox profile directory not found"
+Firefox may be installed in a non-standard location, or you may be using a Snap/Flatpak version with a different profile path. Use the manual paste method instead.
+
+### Safari auto-detect fails with permission error
+On macOS, go to System Settings > Privacy & Security > Full Disk Access and grant access to your terminal app (Terminal, iTerm2, etc.) or Python.
 
 ### Widget shows 0% on all bars
-The API response format may have changed, or the initial fetch failed silently. Click **Settings > Refresh now**. If it persists, re-paste cookies.
+The API response format may have changed, or the initial fetch failed silently. Click **Settings > Refresh now**. If it persists, reconnect.
 
 ### `ModuleNotFoundError: No module named 'curl_cffi'`
 Make sure you installed into the correct Python environment: `pip install curl_cffi`. If you have multiple Python versions, use `python -m pip install curl_cffi` with the same `python` you use to launch the widget.
@@ -112,6 +139,7 @@ Install tkinter for your distro: `sudo apt install python3-tk` (Debian/Ubuntu) o
 - **Cookies are stored locally** in `config.json` in the same directory as the script. This file is gitignored and never committed.
 - On Unix systems, `config.json` is automatically restricted to owner-only permissions (`chmod 600`).
 - Cookie input is sanitized to strip control characters before use.
+- Firefox cookies are read from a temporary copy of the database — the original is never modified.
 - No data is sent anywhere except `claude.ai` — there is no telemetry, analytics, or third-party communication.
 
 ## Disclaimer
@@ -120,7 +148,8 @@ This tool uses claude.ai's internal, undocumented API. It is not affiliated with
 
 ## Limitations
 
-- **Cloudflare cookies expire** every 2-4 hours, requiring a fresh paste
+- **Cloudflare cookies expire** every 2-4 hours, requiring reconnection
+- **Chrome/Chromium auto-detect not possible** due to App-Bound Encryption
 - **Unofficial API** - Uses claude.ai's internal API which could change without notice
 - **Font rendering** - Uses Segoe UI (Windows default). Falls back to system default on other platforms.
 
