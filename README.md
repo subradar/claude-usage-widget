@@ -36,15 +36,24 @@ pip install -r requirements.txt
 
 ## Usage
 
+### Quick Launch (no terminal needed)
+
+| Platform | Double-click |
+|----------|-------------|
+| **Windows** | `run.pyw` (recommended) or `run.bat` |
+| **macOS / Linux** | `run.sh` (make executable first: `chmod +x run.sh`) |
+
+### From the command line
+
 ```bash
 python claude_usage.py
 ```
 
-Or with `pythonw` on Windows to avoid the console window entirely:
+### Creating a desktop shortcut
 
-```bash
-pythonw claude_usage.py
-```
+- **Windows**: Right-click `run.pyw` > Send to > Desktop (create shortcut)
+- **macOS**: Create an Automator "Application" that runs `run.sh`, or drag to Dock
+- **Linux**: Create a `.desktop` file pointing to `run.sh`
 
 ### First Run Setup
 

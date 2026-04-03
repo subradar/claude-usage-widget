@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.2.1] - 2026-04-03
+
+### Added
+- Launcher scripts: `run.pyw` (Windows, no console), `run.bat` (Windows fallback), `run.sh` (macOS/Linux)
+- Desktop shortcut instructions in README
+- "Disconnect (clear cookies)" option in Settings menu
+
 ## [1.2.0] - 2026-04-03
 
 ### Added
